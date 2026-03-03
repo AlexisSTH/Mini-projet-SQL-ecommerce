@@ -15,3 +15,19 @@ SELECT
     ROUND(SUM(CASE WHEN statut = 'en cours' THEN 1 ELSE 0 END) * 100.0 
         / COUNT(*), 2) AS taux_en_cours
 FROM commandes;
+
+--- TAUX DE REACHAT CLIENT
+SELECT 
+    ROUND(COUNT(CASE WHEN nb_commandes > 1 THEN 1 END) * 100.0 
+        / COUNT(*), 2) AS taux_reachat,
+    COUNT(CASE WHEN nb_commandes = 1 THEN 1 END) AS clients_uniques,
+    COUNT(CASE WHEN nb_commandes > 1 THEN 1 END) AS clients_fidelises,
+    COUNT(*) AS total_clients
+FROM (
+    SELECT 
+        id_client, 
+        COUNT(*) AS nb_commandes
+    FROM commandes
+    WHERE statut = 'livré'
+    GROUP BY id_client
+) AS frequences;
