@@ -6,6 +6,21 @@ from commandes
 GROUP BY statut
 ORDER BY nombre DESC;
 
+--- TAUX DE CONVERSION PAR PRODUIT
+SELECT 
+    p.nom_produit,
+    p.categorie,
+    COUNT(DISTINCT c.id_commande) AS total_commandes,
+    SUM(CASE WHEN c.statut = 'livré' THEN 1 ELSE 0 END) AS livrees,
+    SUM(CASE WHEN c.statut = 'annulé' THEN 1 ELSE 0 END) AS annulees,
+    ROUND(SUM(CASE WHEN c.statut = 'livré' THEN 1 ELSE 0 END) * 100.0 
+        / COUNT(DISTINCT c.id_commande), 2) AS taux_conversion
+FROM commandes c
+JOIN details_commandes dc ON c.id_commande = dc.id_commande
+JOIN produits p ON dc.id_produit = p.id_produit
+GROUP BY p.id_produit, p.nom_produit, p.categorie
+ORDER BY taux_conversion DESC;
+
 --- TAUX DE LIVRAISON VS ANNULATION
 SELECT 
     ROUND(SUM(CASE WHEN statut = 'livré' THEN 1 ELSE 0 END) * 100.0 
