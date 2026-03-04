@@ -23,3 +23,20 @@ WHERE co.statut = 'livré'
 GROUP BY c.id_client, c.nom
 ORDER BY panier_moyen DESC
 LIMIT 10;
+
+--- clients qui commandent le plus souvent 
+SELECT 
+    c.nom,
+    COUNT(DISTINCT co.id_commande) AS nb_commandes,
+    DATEDIFF(MAX(co.date_commande), 
+             MIN(co.date_commande)) AS jours_entre,
+    ROUND(DATEDIFF(MAX(co.date_commande), 
+        MIN(co.date_commande)) / 
+        COUNT(DISTINCT co.id_commande), 0) AS jours_entre_commandes
+FROM clients c
+JOIN commandes co ON c.id_client = co.id_client
+WHERE co.statut = 'livré'
+GROUP BY c.id_client, c.nom
+HAVING nb_commandes > 1
+ORDER BY jours_entre_commandes ASC
+LIMIT 10;
